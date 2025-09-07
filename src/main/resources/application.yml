@@ -1,0 +1,19 @@
+server:
+  port: 9090  # change if you want
+
+spring:
+  datasource:
+    url: jdbc:mariadb://100.76.101.92:3306/email_scheduler
+    username: resumo_user
+    password: resumo_pass
+    hikari:
+      connection-init-sql: "SET time_zone = 'Europe/Stockholm'"
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: resumoindikator@gmail.com        # set as env var at runtime
+    password: eavm cvfk nlkg vpjn   # Gmail App Password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true

@@ -8,7 +8,7 @@ services:
     ports:
       - "9090:9090"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mariadb://100.76.101.92:3306/email_scheduler
+      SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/email_scheduler
       SPRING_DATASOURCE_USERNAME: resumo_user
       SPRING_DATASOURCE_PASSWORD: resumo_pass
       SPRING_MAIL_HOST: smtp.gmail.com

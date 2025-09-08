@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mariadb://100.76.101.92:3306/email_scheduler
+    url: jdbc:mariadb://db:3306/email_scheduler
     username: resumo_user
     password: resumo_pass
     hikari:

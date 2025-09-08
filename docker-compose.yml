@@ -17,3 +17,9 @@ services:
       SPRING_MAIL_PASSWORD: eavm cvfk nlkg vpjn
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+    networks:
+      - resumo_default   # 👈 use the DB's network
+
+networks:
+  resumo_default:
+    external: true       # 👈 tells Docker to use the existing network

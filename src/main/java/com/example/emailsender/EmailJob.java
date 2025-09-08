@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -23,28 +24,42 @@ public class EmailJob {
         this.gmailAddress = gmailAddress;
     }
 
-    // Run once per day at 8 AM
-    //@Scheduled(cron = "0 0 8 * * ?")
+    // Run every 15 seconds
     @Scheduled(cron = "*/15 * * * * ?")
     public void dispatch() {
+        System.out.printf("%n[DEBUG] ===== Scheduler tick at %s =====%n", LocalDateTime.now());
         try {
             LocalDate today = LocalDate.now();
+            System.out.printf("[DEBUG] Today = %s%n", today);
+
             List<EmailRecord> due = dao.fetchDueForToday(today, 50);
-            if (due.isEmpty()) return;
+            System.out.printf("[DEBUG] DAO returned %d records%n", due.size());
+
+            if (due.isEmpty()) {
+                System.out.println("[DEBUG] No emails to send this tick.");
+                return;
+            }
 
             for (EmailRecord r : due) {
+                System.out.printf("[DEBUG] Processing record id=%d, recipient=%s, subject=%s, status=%s, scheduledAt=%s%n",
+                        r.id, r.recipient, r.subject, r.status, r.scheduledAt);
+
                 try {
+                    System.out.printf("[DEBUG] Attempting to send email id=%d to %s%n", r.id, r.recipient);
                     mail.sendHtml(gmailAddress, r.recipient, r.subject, r.body);
                     dao.markSent(r.id);
-                    System.out.printf("SENT id=%d to %s%n", r.id, r.recipient);
+                    System.out.printf("[INFO] SENT id=%d to %s%n", r.id, r.recipient);
                 } catch (Exception ex) {
-                    System.err.printf("FAILED id=%d to %s : %s%n",
+                    System.err.printf("[ERROR] FAILED id=%d to %s : %s%n",
                             r.id, r.recipient, ex.getMessage());
+                    ex.printStackTrace(System.err);
                     dao.markFailed(r.id);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.printf("[FATAL] Exception in scheduler: %s%n", e.getMessage());
+            e.printStackTrace(System.err);
         }
+        System.out.println("[DEBUG] ===== End of scheduler tick =====\n");
     }
 }

@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  email-sender:
+    build: .
+    container_name: email-sender
+    restart: always
+    ports:
+      - "9090:9090"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://100.76.101.92:3306/email_scheduler
+      SPRING_DATASOURCE_USERNAME: resumo_user
+      SPRING_DATASOURCE_PASSWORD: resumo_pass
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: resumoindikator@gmail.com
+      SPRING_MAIL_PASSWORD: eavm cvfk nlkg vpjn
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"

@@ -23,7 +23,7 @@ public class EmailJob {
     }
 
     // Run every 15 seconds
-    @Scheduled(fixedDelay = 15_000)
+    @Scheduled(cron = "0 0 8 * * ?")
     public void dispatch() {
         try {
             List<EmailRecord> due = dao.fetchDue(50);

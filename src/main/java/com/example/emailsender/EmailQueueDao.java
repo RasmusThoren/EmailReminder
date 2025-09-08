@@ -21,7 +21,7 @@ public class EmailQueueDao {
         String sql =
                 "SELECT id, recipient, subject, body, scheduled_at, status, sent_at " +
                         "FROM outbound_emails " +
-                        "WHERE status='PENDING' AND scheduled_at <= CURDATE() " +
+                        "WHERE status=('PENDING', 'FAILED') AND scheduled_at <= CURDATE() " +
                         "ORDER BY scheduled_at ASC " +
                         "LIMIT ?";
         return jdbc.query(sql, (ResultSet rs, int rowNum) -> {

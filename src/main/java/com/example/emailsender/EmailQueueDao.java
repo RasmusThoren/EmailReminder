@@ -20,7 +20,7 @@ public class EmailQueueDao {
         String sql =
                 "SELECT id, recipient, subject, body, scheduled_at, status, sent_at " +
                         "FROM outbound_emails " +
-                        "WHERE status='PENDING' AND scheduled_at <= NOW() " +
+                        "WHERE status='PENDING' AND scheduled_at <= CURDATE() " + // DATE comparison
                         "ORDER BY scheduled_at ASC " +
                         "LIMIT ?";
         return jdbc.query(sql, (ResultSet rs, int rowNum) -> {
@@ -29,11 +29,17 @@ public class EmailQueueDao {
             r.recipient = rs.getString("recipient");
             r.subject = rs.getString("subject");
             r.body = rs.getString("body");
-            Timestamp sched = rs.getTimestamp("scheduled_at");
-            r.scheduledAt = sched != null ? sched.toLocalDateTime() : null;
+
+            // scheduled_at is DATE → map to LocalDate
+            java.sql.Date sched = rs.getDate("scheduled_at");
+            r.scheduledAt = (sched != null ? sched.toLocalDate() : null);
+
             r.status = rs.getString("status");
+
+            // sent_at is DATETIME → map to LocalDateTime
             Timestamp sent = rs.getTimestamp("sent_at");
-            r.sentAt = sent != null ? sent.toLocalDateTime() : null;
+            r.sentAt = (sent != null ? sent.toLocalDateTime() : null);
+
             return r;
         }, limit);
     }

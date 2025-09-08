@@ -5,8 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
-import java.time.Instant;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -20,7 +19,7 @@ public class ReminderController {
 
     /**
      * Example call:
-     *   http://localhost:9090/api/jobs/reminder?recipient=rasmus.thoren@outlook.com&projectname=DemoProjekt&date=2025-09-08T10:00:00+02:00
+     *   http://localhost:9090/api/jobs/reminder?recipient=rasmus.thoren@outlook.com&projectname=DemoProjekt&date=2025-09-08
      */
     @GetMapping("/reminder")
     public ResponseEntity<Boolean> createReminder(
@@ -32,9 +31,9 @@ public class ReminderController {
             return ResponseEntity.ok(false);
         }
 
-        final Instant whenUtc;
+        final LocalDate when;
         try {
-            whenUtc = OffsetDateTime.parse(date).toInstant();
+            when = LocalDate.parse(date); // parse yyyy-MM-dd
         } catch (Exception ex) {
             return ResponseEntity.ok(false);
         }
@@ -48,7 +47,7 @@ public class ReminderController {
                 recipient,
                 subject,
                 bodyHtml,
-                new Date(whenUtc.toEpochMilli()), // store only DATE part
+                Date.valueOf(when),   // store DATE
                 "PENDING"
         );
 
@@ -59,6 +58,7 @@ public class ReminderController {
         return s == null || s.isBlank();
     }
 
+    // Minimal HTML escaping for safe email body
     private static String escapeHtml(String s) {
         return s.replace("&", "&amp;")
                 .replace("<", "&lt;")

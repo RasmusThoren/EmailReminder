@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -22,11 +23,13 @@ public class EmailJob {
         this.gmailAddress = gmailAddress;
     }
 
-    // Run every 15 seconds
-    @Scheduled(cron = "0 0 8 * * ?")
+    // Run once per day at 8 AM
+    //@Scheduled(cron = "0 0 8 * * ?")
+    @Scheduled(cron = "*/15 * * * * ?")
     public void dispatch() {
         try {
-            List<EmailRecord> due = dao.fetchDue(50);
+            LocalDate today = LocalDate.now();
+            List<EmailRecord> due = dao.fetchDueForToday(today, 50);
             if (due.isEmpty()) return;
 
             for (EmailRecord r : due) {
@@ -35,7 +38,8 @@ public class EmailJob {
                     dao.markSent(r.id);
                     System.out.printf("SENT id=%d to %s%n", r.id, r.recipient);
                 } catch (Exception ex) {
-                    System.err.printf("FAILED id=%d to %s : %s%n", r.id, r.recipient, ex.getMessage());
+                    System.err.printf("FAILED id=%d to %s : %s%n",
+                            r.id, r.recipient, ex.getMessage());
                     dao.markFailed(r.id);
                 }
             }
